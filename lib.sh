@@ -1,0 +1,58 @@
+#!/bin/bash
+
+################################################################################
+# ----------------------- Shell tools to handle errors ----------------------- #
+################################################################################
+#                                                                              #
+# @author    : Julien Baeriswyl                                                #
+# @since     : 2017-04-22                                                      #
+# @version   : 0.1                                                             #
+# @date      : 2017-04-22                                                      #
+#                                                                              #
+################################################################################
+
+error ()
+{
+	echo -e "ERROR: $1"
+}
+
+error_fatal ()
+{
+	echo -e "FATAL ERROR: $1"
+}
+
+exit_success ()
+{
+	exit 0
+}
+
+exit_failure ()
+{
+	exit 1
+}
+
+assert ()
+{
+	if ! [ $1 $2 $3 ]; then
+		echo -e "ASSERT: $1 $2 $3$4"
+		exit_failure
+	fi
+}
+
+exit_error ()
+{
+	error_fatal $1
+	exit_failure
+}
+
+f_ping ()
+{
+	ping -c 1 -W 1 $1 > /dev/null
+	echo $?;
+}
+
+f_poogle ()
+{
+	f_ping www.google.com
+	echo $?;
+}
