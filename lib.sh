@@ -39,6 +39,17 @@ assert ()
 	fi
 }
 
+foreach ()
+{
+	local func=$1
+	shift
+	
+	for arg in "$@"
+	do
+		$func $arg
+	done
+}
+
 exit_error ()
 {
 	error_fatal $1
@@ -47,12 +58,12 @@ exit_error ()
 
 f_ping ()
 {
-	ping -c 1 -W 1 $1 > /dev/null
-	echo $?;
+	ping -c 1 -W 1 $1 > /dev/null && return 0
+	return 1
 }
 
 f_poogle ()
 {
-	f_ping www.google.com
-	echo $?;
+	f_ping www.google.com && return 0
+	return 1
 }

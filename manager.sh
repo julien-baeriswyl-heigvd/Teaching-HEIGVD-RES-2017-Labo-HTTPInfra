@@ -2,23 +2,32 @@
 
 source lib.sh
 
+f_image_stop ()
+{
+    docker kill $(docker ps -q --filter ancestor=$1)
+    docker rm $(docker ps -a -q --filter ancestor=$1)
+}
+
 f_build ()
 {
-    pwd=$PWD
-    cd docker-images/apache-php-image
+    local repo=$(dirname $(readlink -f $0))
+    
+    cd $repo/docker-images/apache-php-image
     docker build -t res/apache_php .
-    cd $pwd
+    
+    cd $repo/docker-images/express-image
+    docker build -t res/express_students .
 }
 
 f_start ()
 {
-    docker run -d -p 9090:80 res/apache_php
+    docker run -d -p 9090:80   res/apache_php
+    docker run -d -p 9091:3000 res/express_students
 }
 
 f_stop ()
 {
-    docker kill $(docker ps -q --filter ancestor=res/apache_php)
-    docker rm $(docker ps -a -q --filter ancestor=res/apache_php)
+    foreach f_image_stop res/apache_php res/express_students
 }
 
 echo '#### RES-B : Lab - HTTPIntra ####'
@@ -39,6 +48,7 @@ case $1 in
         echo '    --stop  : stop docker containers'
         ;;
     *)
+        foreach echo pizza kebab burrito tacos
         error 'invalid argument, type `'$0' --help` to see usages.'
         ;;
 esac
