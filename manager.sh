@@ -60,7 +60,6 @@ case $1 in
         echo '    --stop  : stop docker containers'
         ;;
     *)
-        foreach echo pizza kebab burrito tacos
         error 'invalid argument, type `'$0' --help` to see usages.'
         ;;
 esac

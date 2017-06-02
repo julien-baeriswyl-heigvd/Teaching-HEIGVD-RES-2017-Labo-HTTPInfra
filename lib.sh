@@ -50,6 +50,40 @@ foreach ()
 	done
 }
 
+tolower ()
+{
+	echo $1 | tr '[:upper:]' '[:lower:]'
+}
+
+toupper ()
+{
+	echo $1 | tr '[:lower:]' '[:upper:]'
+}
+
+read_condition ()
+{
+	local input
+	while [ 1 ]
+	do
+		read input
+		
+		[ -z "$input" ] && continue
+		
+		input=$(tolower $input)
+		if [ "$input" = "y" -o "$input" = "yes" ]; then
+			return 0
+		elif [ "$input" = "n" -o "$input" = "no" ]; then
+			return 1
+		fi
+	done
+}
+
+ask_condition ()
+{
+	echo -n $1'(Yes/No): '
+	read_condition
+}
+
 exit_error ()
 {
 	error_fatal $1
@@ -58,12 +92,10 @@ exit_error ()
 
 f_ping ()
 {
-	ping -c 1 -W 1 $1 > /dev/null && return 0
-	return 1
+	ping -c 1 -W 1 $1 > /dev/null
 }
 
 f_poogle ()
 {
-	f_ping www.google.com && return 0
-	return 1
+	f_ping www.google.com
 }
