@@ -1,42 +1,37 @@
-var Chance  = require('chance');
 var Express = require('express');
+var Chance  = require('chance');
+var Faker   = require('faker');
 
-var chance  = new Chance();
 var express = new Express();
+var chance  = new Chance();
+var faker   = Faker;
 
-function generateStudents ()
+function generatePlaces ()
 {
-    var numberOfStudents = chance.integer({min: 1, max: 10});
-    console.log(numberOfStudents);
+    var numberOfPlace = chance.integer({min: 1, max: 10});
+    console.log(numberOfPlace);
     
-    var students = [];
-    for (var i = 0; i < numberOfStudents; ++i)
+    var places = [];
+    for (var i = 0; i < numberOfPlace; ++i)
     {
-        var gender    = chance.gender();
-        students.push({
-            firstName: chance.first({gender: gender}),
-            lastName:  chance.last(),
-            gender:    gender,
-            birthday:  chance.birthday({year: chance.integer({min: 1986, max: 1996})})
+        var gender = chance.gender();
+        places.push({
+            address: chance.address(),
+            city:    chance.city(),
+            country: chance.country({ full: true }),
+            text:    chance.paragraph(),
+            image:   faker.image.avatar()
         });
     }
-    console.log(students);
-    return students;
+    console.log();
+    return places;
 }
 
 express.get(
-    '/',
+    '/api/places/',
     function (req, res)
     {
-        res.send("Hello RES");
-    }
-);
-
-express.get(
-    '/test',
-    function (req, res)
-    {
-        res.send(generateStudents());
+        res.send(generatePlaces());
     }
 );
 
