@@ -1,10 +1,8 @@
 var Express = require('express');
 var Chance  = require('chance');
-var Faker   = require('faker');
 
 var express = new Express();
 var chance  = new Chance();
-var faker   = Faker;
 
 function generatePlaces ()
 {
@@ -19,8 +17,8 @@ function generatePlaces ()
             address: chance.address(),
             city:    chance.city(),
             country: chance.country({ full: true }),
-            text:    chance.paragraph(),
-            image:   faker.image.avatar()
+            text:    chance.sentence(),
+            image:   "/api/img/" + chance.integer({min: 1, max: 25}) + ".jpg"
         });
     }
     console.log();
@@ -32,6 +30,14 @@ express.get(
     function (req, res)
     {
         res.send(generatePlaces());
+    }
+);
+
+express.get(
+    '/api/img/:datafile',
+    function (req, res)
+    {
+        res.sendFile('/opt/app/img/' + req.params.datafile);
     }
 );
 
