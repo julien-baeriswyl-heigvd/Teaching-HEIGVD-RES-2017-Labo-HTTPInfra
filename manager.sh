@@ -31,7 +31,7 @@ f_start ()
 {
     docker run -d --net resnet13 --ip 172.18.0.2 res/apache_php
     docker run -d --net resnet13 --ip 172.18.0.3 res/express_students
-    docker run -d --net resnet13 -p 9090:80 res/apache_rp
+    docker run -d --net resnet13 -e "STATIC_APP=172.18.0.2:80" -e "DYNAMIC_APP=172.18.0.3:3000" -p 9090:80 res/apache_rp
 }
 
 f_stop ()
