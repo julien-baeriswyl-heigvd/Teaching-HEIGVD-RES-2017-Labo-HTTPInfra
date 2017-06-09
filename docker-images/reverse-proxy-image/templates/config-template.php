@@ -5,9 +5,20 @@
 <VirtualHost *:80>
     ServerName demo.res.ch
 
-    ProxyPass        '/api/' 'http://<?php print "$host_dynamic";?>/api/'
-    ProxyPassReverse '/api/' 'http://<?php print "$host_dynamic";?>/api/'
+    #ErrorLog ${APACHE_LOG_DIR}/error.log
+    #CustomLog ${APACHE_LOG_DIR}/access.log combined
+    
+    <Proxy "balancer://staticapp">
+        BalancerMember "http://<?php print "$host_static";?>"
+    </Proxy>
+    
+    <Proxy "balancer://dynamicapp">
+        BalancerMember "http://<?php print "$host_dynamic";?>"
+    </Proxy>
 
-    ProxyPass        '/' 'http://<?php print "$host_static";?>/'
-    ProxyPassReverse '/' 'http://<?php print "$host_static";?>/'
+    ProxyPass        "/api/" "balancer://dynamicapp/api/"
+    ProxyPassReverse "/api/" "balancer://dynamicapp/api/"
+
+    ProxyPass        "/" "balancer://staticapp/"
+    ProxyPassReverse "/" "balancer://staticapp/"
 </VirtualHost>
