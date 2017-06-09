@@ -21,8 +21,8 @@ f_build ()
     docker build -t res/apache_php .
     
     cd $repo/docker-images/express-image
-    docker build -t res/express_students .
-    
+    docker build -t res/express_api .
+
     cd $repo/docker-images/reverse-proxy-image
     docker build -t res/apache_rp .
 }
@@ -30,13 +30,13 @@ f_build ()
 f_start ()
 {
     docker run -d --net resnet13 --ip 172.18.0.2 res/apache_php
-    docker run -d --net resnet13 --ip 172.18.0.3 res/express_students
+    docker run -d --net resnet13 --ip 172.18.0.3 res/express_api
     docker run -d --net resnet13 -e "STATIC_APP=172.18.0.2:80" -e "DYNAMIC_APP=172.18.0.3:3000" -p 9090:80 res/apache_rp
 }
 
 f_stop ()
 {
-    foreach f_image_stop res/apache_php res/express_students res/apache_rp
+    foreach f_image_stop res/apache_php res/express_api res/apache_rp
 }
 
 echo '#### RES-B : Lab - HTTPIntra ####'
