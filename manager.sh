@@ -16,18 +16,18 @@ f_build ()
     docker build -t res/apache_php .
     
     cd $repo/docker-images/express-image
-    docker build -t res/express_students .
+    docker build -t res/express_api .
 }
 
 f_start ()
 {
     docker run -d -p 9090:80   res/apache_php
-    docker run -d -p 9091:3000 res/express_students
+    docker run -d -p 9091:3000 res/express_api
 }
 
 f_stop ()
 {
-    foreach f_image_stop res/apache_php res/express_students
+    foreach f_image_stop res/apache_php res/express_api
 }
 
 echo '#### RES-B : Lab - HTTPIntra ####'
