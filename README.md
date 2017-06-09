@@ -1,5 +1,21 @@
 # Teaching-HEIGVD-RES-2017-Labo-HTTPInfra
 
+## Report
+
+### Step 1
+#### Docker configuration
+Static app is available through _Docker_ container from image `res/apache_php`, containing static pages.  
+Inside container, Apache 2 server is available on port 80.  
+Container is exposed from port 9090 of docker virtual machine.  
+
+#### Static app content
+I choose to use `New Age` _Bootstrap_ template as main page. I linked two more templates named `SB Admin 2` and `Creative` to main page, through navigation bar.  
+
+### Step 2
+#### Docker configuration
+I created Express.js server running on port 3000, inside a _Docker_ container of image `express_places`.  
+
+
 ## Objectives
 
 The first objective of this lab is to get familiar with software tools that will allow us to build a **complete web infrastructure**. By that, we mean that we will build an environment that will allow us to serve **static and dynamic content** to web browsers. To do that, we will see that the **apache httpd server** can act both as a **HTTP server** and as a **reverse proxy**. We will also see that **express.js** is a JavaScript framework that makes it very easy to write dynamic web apps.
