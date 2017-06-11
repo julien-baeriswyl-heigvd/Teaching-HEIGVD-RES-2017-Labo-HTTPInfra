@@ -93,6 +93,8 @@ This domain name is fictive and does not exists outside local private network, m
 In order to allow resolution, file `/etc/hosts` on UNIX-like operating systems, or `C:\WINDOWS\system32\drivers\etc\hosts` on Microsoft Windows series must be edited, to add IP address and domain name.  
 In my case, it is `192.168.42.42 demo.res.ch`.  
 
+About configuration files in folder `sites-available`, `000-default.conf` is reduced to empty virtual host, while `001-reverse-proxy.conf` contains all routes and destinations for reverse proxy.  
+
 #### About IP address destination of routes
 These IP address come from _Docker_ containers.
 Each container has an IP address.  
