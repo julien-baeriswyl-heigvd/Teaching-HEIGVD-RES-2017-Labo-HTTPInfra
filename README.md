@@ -83,6 +83,19 @@ This domain name is fictive and does not exists outside local private network, m
 In order to allow resolution, file `/etc/hosts` on UNIX-like operating systems, or `C:\WINDOWS\system32\drivers\etc\hosts` on Microsoft Windows series must be edited, to add IP address and domain name.  
 In my case, it is `192.168.42.42 demo.res.ch`.  
 
+#### About IP address destination of routes
+These IP address come from _Docker_ containers.
+Each container has an IP address.  
+By default, container address is inside subnet `172.17.0.0/16` called `bridge`.  
+Address allocation works on first-come/first-served principle, meaning address of a container from specific image can be different, according to others existing containers.  
+
+This must be a problem.
+Because my proxy configuration is static, IP addresses have to remain same between each executions, to allow reverse proxy to keep working correctly.  
+
+In order to avoid this problem, I prepared my own subnet in _Docker_, called `resnet13`.  
+In this subnet, only mine containers are in execution, allowing me to use static IP address for my containers.  
+I only have to be sure to kill all my containers in this subnet, before relaunching my app.  
+
 ### Step 4
 This step consists of modifying static page content (from server of step 1), on the fly, directly in web browser.  
 To achieve this, I used JavaScript in static page.  
@@ -99,6 +112,7 @@ Modifications are periodic, meaning each defined time interval, script will acqu
     - `loadPlaces` then change H1 of page, and image inside iPhone background.
 
 ### Step 5
+In this step, objective is to get rid of static reverse proxy configuration, and replace it with configuration generated on the fly, at start of proxy container, implying both static and dynamic servers have to be launch before, in order to get their IP address.  
 
 ## Objectives
 
