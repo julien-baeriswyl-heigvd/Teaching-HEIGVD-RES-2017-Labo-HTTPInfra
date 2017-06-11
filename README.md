@@ -136,6 +136,12 @@ However, this PHP script has to be executed before lauching Apache 2.
 To do this, a modified version of `Bash` script called `apache2-foreground` from image `php:5.6-apache` is used.  
 This script is modified to launch PHP interpreter with newly created script `config-template.php`.  
 
+Furthermore, in order to try different IP addresses on containers, I have modified my script `manager.sh`.  
+Now, my script can launch container and get IP address on the fly, with help of generated id and `docker inspect --format=... <cid>` command.  
+With this, I can retrieve IP address and pass it directly to reverse proxy container, at its creation.  
+
+This implies I don't need anymore subnet created in step 3, nor static IP address.  
+
 ## Objectives
 
 The first objective of this lab is to get familiar with software tools that will allow us to build a **complete web infrastructure**. By that, we mean that we will build an environment that will allow us to serve **static and dynamic content** to web browsers. To do that, we will see that the **apache httpd server** can act both as a **HTTP server** and as a **reverse proxy**. We will also see that **express.js** is a JavaScript framework that makes it very easy to write dynamic web apps.
