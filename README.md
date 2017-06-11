@@ -2,19 +2,55 @@
 
 ## Report
 
+### Preface
+To avoid repeating manually commands to build, start and stop containers, a `Bash` script called `manager.sh` is used.  
+Two basic options exist, `--start` and `--stop`.  
+
 ### Step 1
 #### Docker configuration
-Static app is available through _Docker_ container from image `res/apache_php`, containing static pages.  
+Static app is available through _Docker_ container from image `res/apache_php`, based on folder `apache-php-image`,  
+containing static pages.  
 Inside container, Apache 2 server is available on port 80.  
 Container is exposed from port 9090 of docker virtual machine.  
 
 #### Static app content
-I choose to use `New Age` _Bootstrap_ template as main page. I linked two more templates named `SB Admin 2` and `Creative` to main page, through navigation bar.  
+I choose to use [`New Age`](https://startbootstrap.com/template-overviews/new-age/) _Bootstrap_ template as main page.  
+I linked two more templates named [`SB Admin 2`](https://startbootstrap.com/template-overviews/sb-admin-2/) and [`Creative`](https://startbootstrap.com/template-overviews/creative/) to main page, through navigation bar of [`New Age`](https://startbootstrap.com/template-overviews/new-age/) modified template.  
 
-### Step 2
+All content is stored in `site` folder which is copied at _Docker_ image build time.  
+Folder `site` contains [`New Age`](https://startbootstrap.com/template-overviews/new-age/) template.  
+Inside this template are added `creative` and `sbadmin2` containing other secondary templates.  
+
+##### Modifications of [`New Age`](https://startbootstrap.com/template-overviews/new-age/) `index.html` file
+
+ + Title of page
+ + H1 content
+ + navbar-header title
+ + Two links in nav bar called `Dashboard` and `Creative`
+ + Part concerning download has been deleted.
+
+### Step 2
 #### Docker configuration
-I created Express.js server running on port 3000, inside a _Docker_ container of image `express_places`.  
+I created [`Express.js`](https://expressjs.com/) server running on port 3000, inside a _Docker_ container of image `res/express_api`, built on folder `express-image`.  
+Server use `Node.js` to manage dependencies.
+Container is exposed from port 9091 of docker virtual machine.  
 
+#### Server functionalities
+Server provides list (size between 0 and 10) of `JSON` objects containing fake data about places.  
+Some address is generated, along with sentence and some iPhone wallpaper URL (25 available, useful in [`New Age`](https://startbootstrap.com/template-overviews/new-age/) template).  
+
+On the other hand, server also provide wallpaper sending.  
+It allows to get image corresponding to generated URL.  
+
+To summary, server possess two routes (notice both use `/api/` as a start):  
+
+ + `/api/places`
+ + `/api/img/:imgname`
+
+Use packages are:  
+
+ + Express
+ + Chance (used to generate random data)
 
 ## Objectives
 
