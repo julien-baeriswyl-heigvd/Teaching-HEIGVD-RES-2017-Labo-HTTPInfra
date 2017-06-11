@@ -142,6 +142,23 @@ With this, I can retrieve IP address and pass it directly to reverse proxy conta
 
 This implies I don't need anymore subnet created in step 3, nor static IP address.  
 
+### Bonus: load-balancing
+In order to use load balancers of Apache 2, some modules must added.  
+I use two balancers, one per server type, static or dynamic.  
+Now, reverse proxy reference balancers and not IP addresses.  
+
+I extended my `manager.sh` script in order to pass IP addresses in same previous environment variables.  
+Format is `ip1:port1,ip2:port2,...,ipN:portN`.  
+
+At start of reverse proxy container, some new files called `balancer-static.conf` and `balancer-dynamic.conf` are copied.  
+These files are included by `001-reverse-proxy.conf` and contains balancer information.  
+
+These two files are modified on the fly by `apache2-foreground` script, with received environment variables.  
+
+_Remarks_:
+ + `config-template.php` has been abandoned, since `Bash` does all the work.  
+ + default behavior of Apache 2 balancers is round-robin.  
+
 ## Objectives
 
 The first objective of this lab is to get familiar with software tools that will allow us to build a **complete web infrastructure**. By that, we mean that we will build an environment that will allow us to serve **static and dynamic content** to web browsers. To do that, we will see that the **apache httpd server** can act both as a **HTTP server** and as a **reverse proxy**. We will also see that **express.js** is a JavaScript framework that makes it very easy to write dynamic web apps.
