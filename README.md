@@ -67,6 +67,16 @@ The resulting container will be exposed through port mapping on port 9090 (in re
 Its role will be receive requests and transmit them to right servers, static or dynamic from step 1 and 2.  
 Then, response is collected and sent by reverse proxy to requester.  
 
+#### Apache configuration files in image `php:5.6-apache`
+Configuration files are located in `/etc/apache2/` folder.  
+This folder contains (not complete list):  
+
+ + `apache2.conf`, main configuration file
+ + `sites-available` folder, containg virtual hosts configuration files
+ + `sites-enabled` folder, containing current active sites (or virtual hosts)
+ + `mods-available` folder, containing configuration files for Apache 2 modules
+ + `mods-enabled` folder
+
 #### Apache configuration as reverse proxy
 Apache 2 provide modules named `proxy` and `proxy_http`, which allow to use Apache web server as reverse proxy.  
 Reverse proxy works on basis of routes and destination server.  
@@ -113,6 +123,16 @@ Modifications are periodic, meaning each defined time interval, script will acqu
 
 ### Step 5
 In this step, objective is to get rid of static reverse proxy configuration, and replace it with configuration generated on the fly, at start of proxy container, implying both static and dynamic servers have to be launch before, in order to get their IP address.  
+
+To allow providing these IP address to container, environment variables are passed to container through _Docker_ `run` with option `-e`.  
+These environment variables can be accessed through many programming and scripting languages.  
+In my case, I used PHP, which access these variable through function `getenv`.  
+Once recuperated, these variable can be used to fill blanks in template reverse proxy configuration.  
+Then, filled template can be copied in Apache 2 confuguration folder, at place reserved in step 3.  
+
+However, this PHP script has to be executed before lauching Apache 2.  
+To do this, a modified version of `Bash` script called `apache2-foreground` from image `php:5.6-apache` is used.  
+This script is modified to launch PHP interpreter with newly created script `config-template.php`.  
 
 ## Objectives
 
