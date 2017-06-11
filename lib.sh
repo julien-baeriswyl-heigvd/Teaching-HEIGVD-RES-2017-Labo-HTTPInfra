@@ -50,6 +50,17 @@ foreach ()
 	done
 }
 
+repeat ()
+{
+	local count=$1
+	shift
+	
+	for ((x=1; x <= count ; x++))
+	do
+		$@
+	done
+}
+
 tolower ()
 {
 	echo $1 | tr '[:upper:]' '[:lower:]'
