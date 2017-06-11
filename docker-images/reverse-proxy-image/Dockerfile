@@ -2,6 +2,10 @@ FROM php:5.6-apache
 
 MAINTAINER Julien Baeriswyl <julien.baeriswyl@heig-vd.ch>
 
+# copy some scripts to run Apache Load Balancer
+#COPY scripts/start-lb.sh /start-lb.sh
+#COPY scripts/lb-worker.sh /lb-worker.sh
+
 COPY apache2-foreground /usr/local/bin/
 COPY templates/ /var/apache2/templates
 COPY conf/ /etc/apache2/
@@ -11,11 +15,6 @@ RUN a2enmod proxy proxy_balancer proxy_http proxy_connect lbmethod_bybusyness lb
 
 # enable Apache2 sites
 RUN a2ensite 000-* 001-*
-
-# copy some scripts to run Apache Load Balancer
-#COPY scripts/start-lb.sh /start-lb.sh
-#COPY scripts/lb-add-worker.sh /lb-add-worker.sh
-#COPY scripts/lb-rm-worker.sh /lb-rm-worker.sh
 
 # copy the config files for the load balancer
 #COPY lb-conf/ports.conf          /etc/apache2/

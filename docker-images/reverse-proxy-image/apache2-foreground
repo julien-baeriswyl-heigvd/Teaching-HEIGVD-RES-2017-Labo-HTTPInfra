@@ -42,6 +42,47 @@ echo "Setup for the RES lab..."
 echo "Static app URL: $STATIC_APP"
 echo "Dynamic app URL: $DYNAMIC_APP"
 
-php /var/apache2/templates/config-template.php > '/etc/apache2/sites-available/001-reverse-proxy.conf'
+#php /var/apache2/templates/config-template.php > '/etc/apache2/sites-available/001-reverse-proxy.conf'
+
+foreach ()
+{
+	local func=$1
+	shift
+	
+	for arg in "$@"
+	do
+		$func $arg
+	done
+}
+
+f_lb_file ()
+{
+    echo '/etc/apache2/balancer-'$1'.conf'
+}
+
+f_lb_add ()
+{
+    sed -e "s/<\/Proxy>/  BalancerMember http:\/\/$2\n<\/Proxy>/" $(f_lb_file $1) > $(f_lb_file $1).tmp;
+    mv $(f_lb_file $1).tmp $(f_lb_file $1)
+}
+
+f_lb_rm ()
+{
+    sed "/$2/d" $(f_lb_file $1) > $(f_lb_file $1).tmp;
+    mv $(f_lb_file $1).tmp $(f_lb_file $1)
+}
+
+f_run_static ()
+{
+    f_lb_add static $1
+}
+
+f_run_dynamic ()
+{
+    f_lb_add dynamic $1
+}
+
+foreach f_run_static $(echo $STATIC_APP | tr ',' ' ')
+foreach f_run_dynamic $(echo $DYNAMIC_APP | tr ',' ' ')
 
 exec apache2 -DFOREGROUND "$@"
