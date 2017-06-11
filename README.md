@@ -292,6 +292,8 @@ These two files are modified on the fly by `apache2-foreground` script, with rec
 _Remarks_:
  + `config-template.php` has been abandoned, since `Bash` does all the work.  
  + default behavior of Apache 2 balancers is round-robin.  
+ + `balancer-manager` and `server-status` handlers have been added to configuration of reverse proxy.  
+   They can be accessed through URI `/res-balancer` and `/res-status`.  
 
 ### Bonus: load-balancing with sticky sessions
 In this step, I modified balancer of static servers to manage sticky sessions.  
