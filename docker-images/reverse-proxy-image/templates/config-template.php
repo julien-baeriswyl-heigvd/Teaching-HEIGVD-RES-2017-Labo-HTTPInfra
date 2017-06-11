@@ -15,7 +15,18 @@
     <Proxy "balancer://dynamicapp">
         BalancerMember "http://<?php print "$host_dynamic";?>"
     </Proxy>
+    
+    <Location /res-balancer>
+        SetHandler balancer-manager
+    </Location>
+    
+    <Location "/res-status">
+        SetHandler server-status
+    </Location>
 
+    ProxyPass        /res-balancer    !
+    ProxyPass        /res-status      !
+    
     ProxyPass        "/api/" "balancer://dynamicapp/api/"
     ProxyPassReverse "/api/" "balancer://dynamicapp/api/"
 

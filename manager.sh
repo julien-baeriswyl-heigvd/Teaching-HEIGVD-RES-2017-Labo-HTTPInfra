@@ -25,6 +25,9 @@ f_build ()
 
     cd $repo/docker-images/reverse-proxy-image
     docker build -t res/apache_rp .
+    
+    cd $repo/docker-images/manager-image
+    docker build -t res/node_manager .
 }
 
 f_start ()
