@@ -8,9 +8,10 @@ Two basic options exist, `--start` and `--stop`.
 
 ### Step 1
 #### Docker configuration
-Static app is available through _Docker_ container from image `res/apache_php`, based on folder `apache-php-image`,  
+Static app is available through _Docker_ container from image `res/apache_php`, built on folder `apache-php-image`,  
 containing static pages.  
-Inside container, Apache 2 server is available on port 80.  
+_Docker_ image is based on `php:5.6-apache` which provide both PHP interpreter and Apache 2 web server.  
+Inside container, Apache 2 server is available on port 80.  
 Container is exposed from port 9090 of docker virtual machine.  
 
 #### Static app content
@@ -31,8 +32,10 @@ Inside this template are added `creative` and `sbadmin2` containing other second
 
 ### Step 2
 #### Docker configuration
+Same as before, but with new container available.  
 I created [`Express.js`](https://expressjs.com/) server running on port 3000, inside a _Docker_ container of image `res/express_api`, built on folder `express-image`.  
-Server use `Node.js` to manage dependencies.
+Server use `Node.js` to manage dependencies.  
+_Docker_ image is based on `node:4.4`.  
 Container is exposed from port 9091 of docker virtual machine.  
 
 #### Server functionalities
@@ -51,6 +54,51 @@ Use packages are:
 
  + Express
  + Chance (used to generate random data)
+
+### Step 3
+#### Docker configuration
+This time, previous container are still available, but inaccessible through port mapping.  
+Objective is centralize accesses to both static and dynamic server through reverse proxy.  
+Reverse proxy will serve as unique entry point through whole application.  
+
+In order to achieve this goal, I used new _Docker_ image named `res/apache_rp`, based on `php:5.6-apache`.  
+Image is built on folder `reverse-proxy-image`.  
+The resulting container will be exposed through port mapping on port 9090 (in replacement of all previous port mapping).  
+Its role will be receive requests and transmit them to right servers, static or dynamic from step 1 and 2.  
+Then, response is collected and sent by reverse proxy to requester.  
+
+#### Apache configuration as reverse proxy
+Apache 2 provide modules named `proxy` and `proxy_http`, which allow to use Apache web server as reverse proxy.  
+Reverse proxy works on basis of routes and destination server.  
+In configuration, these routes must appear from most specific to less specific, eventually with default route.  
+
+In my case, only two servers are concerned, both static and dynamic from step 1 and 2.  
+Dynamic server possess more specfific routes, each of them beginning with `/api/`.  
+Static has less specific and heteroclitic routes, and can be referenced directly in default route `/`.  
+
+Moreover, in order to be reactive to right accesses, domain name `demo.res.ch` is used as server name,  
+implying URL host has to be this domain name.  
+
+This domain name is fictive and does not exists outside local private network, meaning my computer is not able to resolve IP address from this domain name.  
+In order to allow resolution, file `/etc/hosts` on UNIX-like operating systems, or `C:\WINDOWS\system32\drivers\etc\hosts` on Microsoft Windows series must be edited, to add IP address and domain name.  
+In my case, it is `192.168.42.42 demo.res.ch`.  
+
+### Step 4
+This step consists of modifying static page content (from server of step 1), on the fly, directly in web browser.  
+To achieve this, I used JavaScript in static page.  
+Newly created script get data from dynamic server of step 2, and use received data to modify page.  
+Modifications are periodic, meaning each defined time interval, script will acquire data and modify page again.  
+
+#### Modifications of [`New Age`](https://startbootstrap.com/template-overviews/new-age/) template
+
+ + Include new script called `res-api.js` through `script` markup, at end of `index.html` file
+ + Create script called `res-api.js` in `js` folder of template
+ + Script behavior:
+    - use `setInterval`, with 4000 milisecond and function called `loadPlaces`.
+    - `loadPlaces` fetch data, and choose first item of data (if available).
+    - `loadPlaces` then change H1 of page, and image inside iPhone background.
+
+### Step 5
 
 ## Objectives
 
