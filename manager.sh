@@ -19,6 +19,7 @@ f_stop ()
 {
     docker kill $(docker ps -q --filter ancestor=res/apache_php)
     docker rm $(docker ps -a -q --filter ancestor=res/apache_php)
+    docker rmi res/apache_php
 }
 
 echo '#### RES-B : Lab - HTTPIntra ####'
