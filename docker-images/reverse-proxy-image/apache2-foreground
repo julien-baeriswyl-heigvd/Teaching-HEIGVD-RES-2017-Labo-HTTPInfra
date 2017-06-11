@@ -55,6 +55,18 @@ foreach ()
 	done
 }
 
+foreach2 ()
+{
+	local func=$1
+	shift
+	
+	while [ $# -gt 0 ]
+	do
+		$func $1 $#
+		shift
+	done
+}
+
 f_lb_file ()
 {
     echo '/etc/apache2/balancer-'$1'.conf'
@@ -66,6 +78,12 @@ f_lb_add ()
     mv $(f_lb_file $1).tmp $(f_lb_file $1)
 }
 
+f_lb_add2 ()
+{
+    sed -e "s/<\/Proxy>/  BalancerMember http:\/\/$2 route=$3\n<\/Proxy>/" $(f_lb_file $1) > $(f_lb_file $1).tmp;
+    mv $(f_lb_file $1).tmp $(f_lb_file $1)
+}
+
 f_lb_rm ()
 {
     sed "/$2/d" $(f_lb_file $1) > $(f_lb_file $1).tmp;
@@ -74,7 +92,7 @@ f_lb_rm ()
 
 f_run_static ()
 {
-    f_lb_add static $1
+    f_lb_add2 static $1 $2
 }
 
 f_run_dynamic ()
@@ -82,7 +100,8 @@ f_run_dynamic ()
     f_lb_add dynamic $1
 }
 
-foreach f_run_static $(echo $STATIC_APP | tr ',' ' ')
+
+foreach2 f_run_static $(echo $STATIC_APP | tr ',' ' ')
 foreach f_run_dynamic $(echo $DYNAMIC_APP | tr ',' ' ')
 
 exec apache2 -DFOREGROUND "$@"
