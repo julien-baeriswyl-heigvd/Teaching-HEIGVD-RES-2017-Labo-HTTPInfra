@@ -1,16 +1,15 @@
 {
-  "name": "students",
+  "name": "resapi",
   "version": "0.1.0",
-  "description": "Just for a demo",
+  "description": "Dynamic API for RES HTTP infrastructure lab",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Julien Baeriswyl & Abassali Mahdavi",
+  "author": "Julien Baeriswyl",
   "license": "ISC",
   "dependencies": {
     "chance": "^1.0.8",
-    "express": "^4.15.2",
-    "faker": "^4.1.0"
+    "express": "^4.15.2"
   }
 }
