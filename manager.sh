@@ -6,6 +6,7 @@ f_image_stop ()
 {
     docker kill $(docker ps -q --filter ancestor=$1)
     docker rm $(docker ps -a -q --filter ancestor=$1)
+    docker rmi $1
 }
 
 f_build ()
