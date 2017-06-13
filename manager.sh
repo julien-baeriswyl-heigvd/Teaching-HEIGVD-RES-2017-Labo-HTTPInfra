@@ -61,17 +61,25 @@ f_stop ()
     foreach f_image_stop res/apache_php res/express_api res/apache_rp
 }
 
-f_json_get ()
+f_get ()
 {
-    curl -X GET -i "$1" &
+    curl -s -D - "$1" -o /dev/null &
+}
+
+f_get2 ()
+{
+    curl -s -D - $1 -b $2 -o /dev/null
 }
 
 f_test_lb_static ()
 {
-    local count=20
+    local count=5
+    
     for ((x=1; x <= count ; x++))
     do
-        repeat 50 f_json_get http://demo.res.ch:9090/ &
+        curl -c cookie.txt http://demo.res.ch:9090/ -o /dev/null
+        cat cookie.txt
+        repeat 5 f_get2 http://demo.res.ch:9090/ cookie.txt
         sleep 1
     done
 }
@@ -81,7 +89,7 @@ f_test_lb_dynamic ()
     local count=20
     for ((x=1; x <= count ; x++))
     do
-        repeat 50 f_json_get http://demo.res.ch:9090/api/places/ &
+        repeat 50 f_get http://demo.res.ch:9090/api/places/ &
         sleep 1
     done
 }
@@ -100,8 +108,8 @@ case $1 in
         f_stop
         ;;
     --test)
-        f_test_lb_static &
-        f_test_lb_dynamic &
+        f_test_lb_static
+        f_test_lb_dynamic
         ;;
     --help)
         echo 'USAGE: '$0' [OPTION]'
