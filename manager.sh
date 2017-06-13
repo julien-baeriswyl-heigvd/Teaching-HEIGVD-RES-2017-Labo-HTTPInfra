@@ -80,7 +80,6 @@ f_test_lb_static ()
         curl -c cookie.txt http://demo.res.ch:9090/ -o /dev/null
         cat cookie.txt
         repeat 5 f_get2 http://demo.res.ch:9090/ cookie.txt
-        sleep 1
     done
 }
 
