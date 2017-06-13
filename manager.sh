@@ -61,6 +61,31 @@ f_stop ()
     foreach f_image_stop res/apache_php res/express_api res/apache_rp
 }
 
+f_json_get ()
+{
+    curl -X GET -i "$1" &
+}
+
+f_test_lb_static ()
+{
+    local count=20
+    for ((x=1; x <= count ; x++))
+    do
+        repeat 50 f_json_get http://demo.res.ch:9090/ &
+        sleep 1
+    done
+}
+
+f_test_lb_dynamic ()
+{
+    local count=20
+    for ((x=1; x <= count ; x++))
+    do
+        repeat 50 f_json_get http://demo.res.ch:9090/api/places/ &
+        sleep 1
+    done
+}
+
 echo '#### RES-B : Lab - HTTPIntra ####'
 
 case $1 in
@@ -73,6 +98,10 @@ case $1 in
         ;;
     --stop)
         f_stop
+        ;;
+    --test)
+        f_test_lb_static &
+        f_test_lb_dynamic &
         ;;
     --help)
         echo 'USAGE: '$0' [OPTION]'
