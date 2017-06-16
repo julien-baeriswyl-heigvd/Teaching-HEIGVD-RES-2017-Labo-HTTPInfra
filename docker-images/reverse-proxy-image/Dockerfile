@@ -3,6 +3,7 @@ FROM php:5.6-apache
 MAINTAINER Julien Baeriswyl <julien.baeriswyl@heig-vd.ch>
 
 COPY apache2-foreground /usr/local/bin/
+COPY apachetools.sh /usr/local/bin/
 COPY conf/ /etc/apache2/
 
 # enable Apache2 modules

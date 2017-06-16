@@ -68,7 +68,7 @@ f_get ()
 
 f_get2 ()
 {
-    curl -s -D - $1 -b $2 -o /dev/null
+    curl -s -i $1 -b $2
 }
 
 f_test_lb_static ()
