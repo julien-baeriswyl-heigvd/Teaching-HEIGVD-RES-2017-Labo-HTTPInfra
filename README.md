@@ -295,7 +295,7 @@ _Remarks_:
  + `balancer-manager` and `server-status` handlers have been added to configuration of reverse proxy.  
    They can be accessed through URI `/res-balancer` and `/res-status`.  
 
-### Bonus: load-balancing with sticky sessions
+### Bonus: load-balancing with sticky sessions, dynamic tests
 In this step, I modified balancer of static servers to manage sticky sessions.  
 Apache 2 possess some [configuration options](https://httpd.apache.org/docs/2.4/fr/mod/mod_proxy_balancer.html) for this feature.  
 We define some route id for each member and server keep track of used route, according to requester.  
@@ -303,3 +303,7 @@ We define some route id for each member and server keep track of used route, acc
 In my reverse proxy image, I changed my `apache2-foreground`, in order to generate route ids on the fly, when each member is added to balancer configuration.  
 
 Of course base options like `Header` and `ProxySet` have been added directly in `balancer-static.conf`.  
+
+On the other hand, a script called `apachetools.sh` has been added to reverse proxy image, in order to change apache configuration more easily.  
+
+`manager.sh` script has been extended to test balancer, with help of batches of requests.
