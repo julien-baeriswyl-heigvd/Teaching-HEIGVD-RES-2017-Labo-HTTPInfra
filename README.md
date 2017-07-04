@@ -1,5 +1,6 @@
 # Teaching-HEIGVD-RES-2017-Labo-HTTPInfra
 
+
 ## Objectives
 
 The first objective of this lab is to get familiar with software tools that will allow us to build a **complete web infrastructure**. By that, we mean that we will build an environment that will allow us to serve **static and dynamic content** to web browsers. To do that, we will see that the **apache httpd server** can act both as a **HTTP server** and as a **reverse proxy**. We will also see that **express.js** is a JavaScript framework that makes it very easy to write dynamic web apps.
@@ -132,3 +133,177 @@ The third objective is to practice our usage of **Docker**. All the components o
 * You develop a web app (e.g. with express.js) that administrators can use to monitor and update your web infrastructure.
 * You find a way to control your Docker environment (list containers, start/stop containers, etc.) from the web app. For instance, you use the Dockerode npm module (or another Docker client library, in any of the supported languages).
 * You have documented your configuration and your validation procedure in your report.
+
+## Report
+
+### Preface
+To avoid repeating manually commands to build, start and stop containers, a `Bash` script called `manager.sh` is used.  
+Two basic options exist, `--start` and `--stop`.  
+
+### Step 1
+#### Docker configuration
+Static app is available through _Docker_ container from image `res/apache_php`, built on folder `apache-php-image`,  
+containing static pages.  
+_Docker_ image is based on `php:5.6-apache` which provide both PHP interpreter and Apache 2 web server.  
+Inside container, Apache 2 server is available on port 80.  
+Container is exposed from port 9090 of docker virtual machine.  
+
+#### Static app content
+I choose to use [`New Age`](https://startbootstrap.com/template-overviews/new-age/) _Bootstrap_ template as main page.  
+I linked two more templates named [`SB Admin 2`](https://startbootstrap.com/template-overviews/sb-admin-2/) and [`Creative`](https://startbootstrap.com/template-overviews/creative/) to main page, through navigation bar of [`New Age`](https://startbootstrap.com/template-overviews/new-age/) modified template.  
+
+All content is stored in `site` folder which is copied at _Docker_ image build time.  
+Folder `site` contains [`New Age`](https://startbootstrap.com/template-overviews/new-age/) template.  
+Inside this template are added `creative` and `sbadmin2` containing other secondary templates.  
+
+##### Modifications of [`New Age`](https://startbootstrap.com/template-overviews/new-age/) `index.html` file
+
+ + Title of page
+ + H1 content
+ + navbar-header title
+ + Two links in nav bar called `Dashboard` and `Creative`
+ + Part concerning download has been deleted.
+
+### Step 2
+#### Docker configuration
+Same as before, but with new container available.  
+I created [`Express.js`](https://expressjs.com/) server running on port 3000, inside a _Docker_ container of image `res/express_api`, built on folder `express-image`.  
+Server use `Node.js` to manage dependencies.  
+_Docker_ image is based on `node:4.4`.  
+Container is exposed from port 9091 of docker virtual machine.  
+
+#### Server functionalities
+Server provides list (size between 0 and 10) of `JSON` objects containing fake data about places.  
+Some address is generated, along with sentence and some iPhone wallpaper URL (25 available, useful in [`New Age`](https://startbootstrap.com/template-overviews/new-age/) template).  
+
+On the other hand, server also provide wallpaper sending.  
+It allows to get image corresponding to generated URL.  
+
+To summary, server possess two routes (notice both use `/api/` as a start):  
+
+ + `/api/places`
+ + `/api/img/:imgname`
+
+Use packages are:  
+
+ + Express
+ + Chance (used to generate random data)
+
+### Step 3
+#### Docker configuration
+This time, previous container are still available, but inaccessible through port mapping.  
+Objective is centralize accesses to both static and dynamic server through reverse proxy.  
+Reverse proxy will serve as unique entry point through whole application.  
+
+In order to achieve this goal, I used new _Docker_ image named `res/apache_rp`, based on `php:5.6-apache`.  
+Image is built on folder `reverse-proxy-image`.  
+The resulting container will be exposed through port mapping on port 9090 (in replacement of all previous port mapping).  
+Its role will be receive requests and transmit them to right servers, static or dynamic from step 1 and 2.  
+Then, response is collected and sent by reverse proxy to requester.  
+
+#### Apache configuration files in image `php:5.6-apache`
+Configuration files are located in `/etc/apache2/` folder.  
+This folder contains (not complete list):  
+
+ + `apache2.conf`, main configuration file
+ + `sites-available` folder, containg virtual hosts configuration files
+ + `sites-enabled` folder, containing current active sites (or virtual hosts)
+ + `mods-available` folder, containing configuration files for Apache 2 modules
+ + `mods-enabled` folder
+
+#### Apache configuration as reverse proxy
+Apache 2 provide modules named `proxy` and `proxy_http`, which allow to use Apache web server as reverse proxy.  
+Reverse proxy works on basis of routes and destination server.  
+In configuration, these routes must appear from most specific to less specific, eventually with default route.  
+
+In my case, only two servers are concerned, both static and dynamic from step 1 and 2.  
+Dynamic server possess more specfific routes, each of them beginning with `/api/`.  
+Static has less specific and heteroclitic routes, and can be referenced directly in default route `/`.  
+
+Moreover, in order to be reactive to right accesses, domain name `demo.res.ch` is used as server name,  
+implying URL host has to be this domain name.  
+
+This domain name is fictive and does not exists outside local private network, meaning my computer is not able to resolve IP address from this domain name.  
+In order to allow resolution, file `/etc/hosts` on UNIX-like operating systems, or `C:\WINDOWS\system32\drivers\etc\hosts` on Microsoft Windows series must be edited, to add IP address and domain name.  
+In my case, it is `192.168.42.42 demo.res.ch`.  
+
+About configuration files in folder `sites-available`, `000-default.conf` is reduced to empty virtual host, while `001-reverse-proxy.conf` contains all routes and destinations for reverse proxy.  
+
+#### About IP address destination of routes
+These IP address come from _Docker_ containers.
+Each container has an IP address.  
+By default, container address is inside subnet `172.17.0.0/16` called `bridge`.  
+Address allocation works on first-come/first-served principle, meaning address of a container from specific image can be different, according to others existing containers.  
+
+This must be a problem.
+Because my proxy configuration is static, IP addresses have to remain same between each executions, to allow reverse proxy to keep working correctly.  
+
+In order to avoid this problem, I prepared my own subnet in _Docker_, called `resnet13`.  
+In this subnet, only mine containers are in execution, allowing me to use static IP address for my containers.  
+I only have to be sure to kill all my containers in this subnet, before relaunching my app.  
+
+### Step 4
+This step consists of modifying static page content (from server of step 1), on the fly, directly in web browser.  
+To achieve this, I used JavaScript in static page.  
+Newly created script get data from dynamic server of step 2, and use received data to modify page.  
+Modifications are periodic, meaning each defined time interval, script will acquire data and modify page again.  
+
+#### Modifications of [`New Age`](https://startbootstrap.com/template-overviews/new-age/) template
+
+ + Include new script called `res-api.js` through `script` markup, at end of `index.html` file
+ + Create script called `res-api.js` in `js` folder of template
+ + Script behavior:
+    - use `setInterval`, with 4000 milisecond and function called `loadPlaces`.
+    - `loadPlaces` fetch data, and choose first item of data (if available).
+    - `loadPlaces` then change H1 of page, and image inside iPhone background.
+
+### Step 5
+In this step, objective is to get rid of static reverse proxy configuration, and replace it with configuration generated on the fly, at start of proxy container, implying both static and dynamic servers have to be launch before, in order to get their IP address.  
+
+To allow providing these IP address to container, environment variables are passed to container through _Docker_ `run` with option `-e`.  
+These environment variables can be accessed through many programming and scripting languages.  
+In my case, I used PHP, which access these variable through function `getenv`.  
+Once recuperated, these variable can be used to fill blanks in template reverse proxy configuration.  
+Then, filled template can be copied in Apache 2 confuguration folder, at place reserved in step 3.  
+
+However, this PHP script has to be executed before lauching Apache 2.  
+To do this, a modified version of `Bash` script called `apache2-foreground` from image `php:5.6-apache` is used.  
+This script is modified to launch PHP interpreter with newly created script `config-template.php`.  
+
+Furthermore, in order to try different IP addresses on containers, I have modified my script `manager.sh`.  
+Now, my script can launch container and get IP address on the fly, with help of generated id and `docker inspect --format=... <cid>` command.  
+With this, I can retrieve IP address and pass it directly to reverse proxy container, at its creation.  
+
+This implies I don't need anymore subnet created in step 3, nor static IP address.  
+
+### Bonus: load-balancing
+In order to use load balancers of Apache 2, some modules must added.  
+I use two balancers, one per server type, static or dynamic.  
+Now, reverse proxy reference balancers and not IP addresses.  
+
+I extended my `manager.sh` script in order to pass IP addresses in same previous environment variables.  
+Format is `ip1:port1,ip2:port2,...,ipN:portN`.  
+
+At start of reverse proxy container, some new files called `balancer-static.conf` and `balancer-dynamic.conf` are copied.  
+These files are included by `001-reverse-proxy.conf` and contains balancer information.  
+
+These two files are modified on the fly by `apache2-foreground` script, with received environment variables.  
+
+_Remarks_:
+ + `config-template.php` has been abandoned, since `Bash` does all the work.  
+ + default behavior of Apache 2 balancers is round-robin.  
+ + `balancer-manager` and `server-status` handlers have been added to configuration of reverse proxy.  
+   They can be accessed through URI `/res-balancer` and `/res-status`.  
+
+### Bonus: load-balancing with sticky sessions, dynamic tests
+In this step, I modified balancer of static servers to manage sticky sessions.  
+Apache 2 possess some [configuration options](https://httpd.apache.org/docs/2.4/fr/mod/mod_proxy_balancer.html) for this feature.  
+We define some route id for each member and server keep track of used route, according to requester.  
+
+In my reverse proxy image, I changed my `apache2-foreground`, in order to generate route ids on the fly, when each member is added to balancer configuration.  
+
+Of course base options like `Header` and `ProxySet` have been added directly in `balancer-static.conf`.  
+
+On the other hand, a script called `apachetools.sh` has been added to reverse proxy image, in order to change apache configuration more easily.  
+
+`manager.sh` script has been extended to test balancer, with help of batches of requests.
